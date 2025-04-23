@@ -1,11 +1,9 @@
 #ifndef AVLTREE_H
 #define AVLTREE_H
 
-#include <iostream>
-#include <string>
 #include <vector>
+#include <string>
 
-// Stock data structure to store in the AVL tree
 struct StockData {
     std::string ticker;
     std::string date;
@@ -15,29 +13,24 @@ struct StockData {
     double lowPrice;
     long volume;
     
-    StockData() : ticker(""), date(""), openPrice(0), closePrice(0), 
-                  highPrice(0), lowPrice(0), volume(0) {}
-    
-    StockData(std::string t, std::string d, double o, double c, 
-              double h, double l, long v) : ticker(t), date(d), 
-              openPrice(o), closePrice(c), highPrice(h), 
-              lowPrice(l), volume(v) {}
+    StockData(std::string t = "", std::string d = "", 
+              double o = 0, double c = 0, 
+              double h = 0, double l = 0, long v = 0)
+        : ticker(t), date(d), openPrice(o), 
+          closePrice(c), highPrice(h), lowPrice(l), volume(v) {}
 };
 
-// Node structure for AVL Tree
 struct Node {
     StockData data;
     Node* left;
     Node* right;
     int height;
-    
     Node(StockData d) : data(d), left(nullptr), right(nullptr), height(1) {}
 };
 
 class AVLTree {
 private:
     Node* root;
-    
     // Helper functions
     int getHeight(Node* node);
     int getBalanceFactor(Node* node);
@@ -49,23 +42,24 @@ private:
     Node* searchNode(Node* root, std::string ticker, std::string date);
     void inOrderTraversal(Node* root, std::vector<StockData>& result);
     void destroyTree(Node* node);
-    
+
 public:
     AVLTree();
     ~AVLTree();
     
     // CRUD Operations
-    void insert(StockData data);                             // Create
-    StockData* search(std::string ticker, std::string date); // Read
-    bool update(StockData newData);                          // Update
-    bool remove(std::string ticker, std::string date);       // Delete
+    void insert(StockData data);
+    StockData* search(std::string ticker, std::string date);
+    bool update(StockData newData);
+    bool remove(std::string ticker, std::string date);
     
-    // Additional operations
+    // Data Retrieval
     std::vector<StockData> getAllStocks();
     std::vector<StockData> getStocksByTicker(std::string ticker);
-    std::vector<StockData> getStocksByDateRange(std::string ticker, 
-                                               std::string startDate, 
-                                               std::string endDate);
+    std::vector<StockData> getStocksByDateRange(std::string ticker,
+                                              std::string startDate,
+                                              std::string endDate);
+    std::vector<StockData> getMultipleTickers(const std::vector<std::string>& tickers);
 };
 
-#endif // AVLTREE_H
+#endif

@@ -166,6 +166,8 @@ int main() {
 			exportDataAsCSV(stockTree);
 			break;
         case 9:
+        case 10:
+        case 11:
 			std::cout << "Exiting the program...\n";
             return 0;
         default:

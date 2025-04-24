@@ -3,6 +3,7 @@
 #include <iostream>
 #include <iomanip>
 #include <string>
+#include <cmath>
 
 void displayMenu() {
     std::cout << "===== Stock Market Data Analyzer =====\n";
@@ -14,7 +15,9 @@ void displayMenu() {
     std::cout << "6. Display stocks by ticker\n";
     std::cout << "7. Display stocks by date range\n";
     std::cout << "8. Export to File\n";
-    std::cout << "9. Exit\n";
+	std::cout << "9. Calculate financial metrics\n";
+	std::cout << "10. Compare Multiple Stocks\n";
+    std::cout << "11. Exit\n";
     std::cout << "Enter your choice (1-9): ";
 }
 
@@ -63,6 +66,34 @@ void exportDataAsCSV(AVLTree stockTree) {
     else {
         std::cout << "Error opening file for export.\n";
     }
+}
+
+void calculateFinancialMetrics(std::vector<StockData> rangeStocks, int numDays) {
+    int tempSum = 0;
+	double sma = 0.0, ema = 0.0, dailyChange = 0.0, roi = 0.0, volatility = 0.0;
+    for (int i = 0; i < numDays; i++) {
+        tempSum += rangeStocks[numDays - 1].closePrice;
+        if (i == numDays) {
+            dailyChange = rangeStocks[i].closePrice - rangeStocks[i - 1].closePrice;
+        }
+		if (i > 0) {
+			volatility += std::pow((rangeStocks[i].closePrice - rangeStocks[i - 1].closePrice), 2);
+		}
+		if (i == numDays) {
+			ema = rangeStocks[i].closePrice;
+		}
+		else {
+			ema = (rangeStocks[i].closePrice * (2.0 / (numDays + 1))) + (ema * (1 - (2.0 / (numDays + 1))));
+		}
+    }
+	sma = tempSum / numDays;
+	volatility = std::sqrt(volatility / (numDays - 1));
+	roi = ((rangeStocks[numDays - 1].closePrice - rangeStocks[0].openPrice) / rangeStocks[0].openPrice) * 100;
+	std::cout << "Simple Moving Average: " << sma << "\n";
+	std::cout << "Exponential Moving Average: " << ema << "\n";
+	std::cout << "Daily Change: " << dailyChange << "\n";
+	std::cout << "Return on Investments: " << roi << "\n";
+	std::cout << "Volatility: " << volatility << "\n";
 }
 
 int main() {
@@ -165,8 +196,31 @@ int main() {
         case 8:
 			exportDataAsCSV(stockTree);
 			break;
-        case 9:
+        case 9: {
+            int numDays = 0;
+            std::string ticker, startDate, endDate;
+            std::cout << "Enter ticker symbol: ";
+            std::cin >> ticker;
+            std::cout << "Enter start date (YYYY-MM-DD): ";
+            std::cin >> startDate;
+            std::cout << "Enter end date (YYYY-MM-DD): ";
+            std::cin >> endDate;
+
+            std::vector<StockData> allStocks = stockTree.getAllStocks();
+            std::vector<StockData> rangeStocks;
+
+            for (const auto& stock : allStocks) {
+                if (stock.date >= startDate && stock.date <= endDate) {
+                    rangeStocks.push_back(stock);
+                    numDays++;
+                }
+            }
+            std::cout << "For ticker " << ticker << " from " << startDate << " to " << endDate << ":\n";
+            calculateFinancialMetrics(rangeStocks, numDays);
+        }
+            break;
         case 10:
+            break;
         case 11:
 			std::cout << "Exiting the program...\n";
             return 0;

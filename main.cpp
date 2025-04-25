@@ -1,5 +1,6 @@
 #include "AVLTree.h"
 #include "ImportStockData.h"
+#include "TradeSimulation.h"
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -14,8 +15,78 @@ void displayMenu() {
     std::cout << "6. Display stocks by ticker\n";
     std::cout << "7. Display stocks by date range\n";
     std::cout << "8. Export to File\n";
-    std::cout << "9. Exit\n";
+    std::cout << "9. Trading Simulation\n";
+    std::cout << "10. Exit\n";
     std::cout << "Enter your choice (1-9): ";
+}
+
+void displayTradingMenu() {
+    std::cout << "\n===== Trading Menu =====\n";
+    std::cout << "1. Buy Stock\n";
+    std::cout << "2. Sell Stock\n";
+    std::cout << "3. View Portfolio\n";
+    std::cout << "4. View Transaction History\n";
+    std::cout << "5. Back to Main Menu\n";
+    std::cout << "Enter your choice (1-5): ";
+}
+
+oid tradingMenu(Portfolio& portfolio, AVLTree& stockTree) {
+    std::string currentDate = "2025-01-02"; 
+    
+    while (true) {
+        displayTradingMenu();
+        int choice;
+        std::cin >> choice;
+        
+        switch (choice) {
+            case 1: {
+                std::string ticker, date;
+                int quantity;
+                
+                std::cout << "Enter ticker symbol: ";
+                std::cin >> ticker;
+                std::cout << "Enter date (YYYY-MM-DD): ";
+                std::cin >> date;
+                std::cout << "Enter quantity: ";
+                std::cin >> quantity;
+                
+                portfolio.buyStock(ticker, date, quantity, stockTree);
+                break;
+            }
+            case 2: {
+                std::string ticker, date;
+                int quantity;
+                
+                std::cout << "Enter ticker symbol: ";
+                std::cin >> ticker;
+                std::cout << "Enter date (YYYY-MM-DD): ";
+                std::cin >> date;
+                std::cout << "Enter quantity: ";
+                std::cin >> quantity;
+                
+                portfolio.sellStock(ticker, date, quantity, stockTree);
+                break;
+            }
+            case 3:
+                portfolio.displayPortfolio(stockTree, currentDate);
+                break;
+            case 4: {
+                std::cout << "\n=== Transaction History ===\n";
+                for (const auto& transaction : portfolio.getTransactionHistory()) {
+                    std::cout << transaction << "\n";
+                }
+                break;
+            }
+            case 5:
+                return;
+            default:
+                std::cout << "Invalid choice. Please try again.\n";
+        }
+        
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::cin.get();
+        system("cls");
+    }
 }
 
 StockData inputStockData() {
@@ -67,6 +138,7 @@ void exportDataAsCSV(AVLTree stockTree) {
 
 int main() {
     AVLTree stockTree;
+    Portfolio portfolio(10000.0);
     int choice;
 
     while (true) {
@@ -168,8 +240,14 @@ int main() {
         case 9:
 			std::cout << "Exiting the program...\n";
             return 0;
+        case 10: 
+                tradingMenu(portfolio, stockTree);
+                break;
+        case 11: 
+                std::cout << "Exiting the program...\n";
+                return 0;
         default:
-            std::cout << "Invalid choice. Please try again.\n";
+                std::cout << "Invalid choice. Please try again.\n";
         }
 
         // Wait for user input before clearing the screen
